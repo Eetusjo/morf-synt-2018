@@ -6,5 +6,7 @@ rm -r work
 
 export GIT_COMMITTER_NAME=anonymous
 export GIT_COMMITTER_EMAIL=anon@localhost
+export PYTHONPATH=/home/jovyan/src
+
 git clone https://github.com/Eetusjo/morf-synt-2018.git
 
