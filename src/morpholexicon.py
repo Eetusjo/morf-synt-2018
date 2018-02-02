@@ -85,7 +85,7 @@ def entry_t(input, output, continuation, state):
     if state.get_tail().startswith(i) or state.return_all():
         new_state = State(state.get_input() + i, state.get_output() + o, 
                           state.get_tail()[len(i):], state.is_analyzer(), state.return_all())
-        if continuation == None:
+        if continuation is None:
             if len(new_state.get_tail()) == 0:
                 # Successfully analyzed a full word form
                 state.add_result([(new_state.get_input(), new_state.get_output())])
@@ -174,10 +174,11 @@ def load_lexicon(root, rules):
     state = State("", "", "", True, True)
     root(state)
     for (i, o) in state.get_result():
-        r = ReplacedString(i)
-        rules(r)
-        wordform2analysis[r.get_string()].add(o)
-        analysis2wordform[o].add(r.get_string())
+        r = ReplacedString(o)
+        if rules is not None:
+            rules(r)
+        wordform2analysis[r.get_string()].add(i)
+        analysis2wordform[i].add(r.get_string())
 
 def analyze(wordform):
     """ Analyze a word form through lookup """
