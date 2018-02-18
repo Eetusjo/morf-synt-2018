@@ -112,14 +112,20 @@ def replace(from_str, to_str, left_ctxt, right_ctxt, input):
     pattern = "(?P<first>" + left_ctxt + ")" + from_str + "(?P<second>" + right_ctxt + ")"
     replacement = r"\g<first>" + to_str + r"\g<second>"
 
-    before = input.get_string()
+    before = "{:s}".format(input.get_string()) # Make a copy, not a reference
     after = re.sub(pattern, replacement, before)
-    input.set_string(after)
+    while len(before) == len(after) and before != after:
+        # Multiple matches with overlapping contexts:
+        # not allowed when repeatedly inserting or deleting letters, though
+        before = after
+        after = re.sub(pattern, replacement, before)
 
     if input.is_debug():
         print('Rule:    "{:s}" -> "{:s}" || "{:s}" _ "{:s}"'.format(from_str, to_str, left_ctxt, right_ctxt))
-        print('Applied: "{:s}" -> "{:s}"'.format(before, after))
+        print('Applied: "{:s}" -> "{:s}"'.format(input.get_string(), after))
         print()
+
+    input.set_string(after)
 
 def apply(rules, wordform, debug=False):
     """ Apply the rules to a given wordform. This is for testing.
