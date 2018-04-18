@@ -159,4 +159,4 @@ class Ngrams:
             history.append(word)
             if word == ".":
                 break
-        return [*start, *history[2:]]
+        return [*start, *history[3:]]
