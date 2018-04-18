@@ -94,6 +94,9 @@ class Ngrams:
             p += self.weights[4] * self.p_fourgram(word, history)
             weight_sum += self.weights[4]
             
+        if weight_sum == 0.0:
+            return 0.0
+
         return p / weight_sum
 
     def perplexity(self, test_text):
