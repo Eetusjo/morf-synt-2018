@@ -131,31 +131,33 @@ class Ngrams:
     def generate_sentence(self, start=[], max_len=100):
         """ Generate a random sentence that optionally starts with a given list of words. The sentence
         ends when the first period is encountered or when the length of the sentence is 100 words. """
-        # Find out a history for your next sentence: it is some end of sentence in the corpus
-        if len(start) == 0:
-            # The caller does not ask for any particular history, so find a trigram ending in a period
-            preceding_ngrams = \
-                [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys() if w3 == '.']
-        elif len(start) == 1:
-            # The caller only specifies one word in the history: find a matching bigram in the corpus
-            preceding_ngrams = \
-                [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys() if w3 == start[0]]
-        elif len(start) == 2:
-            # The caller only specifies two words in the history: find a matching trigram in the corpus
-            preceding_ngrams = \
+        # Find out a history for your next sentence: it is some ngram that occurs in the corpus
+        # that either matches the end of the given "start" list or that ends in a period
+        preceding3grams = []  # initialize as no match at all
+        if len(start) >= 3:
+            # Find all fourgrams that start with the desired trigram from the "start" list
+            preceding3grams = \
+                [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys() \
+                     if w1 == start[-3] and w2 == start[-2] and w3 == start[-1]]
+        if len(start) >= 2 and len(preceding3grams) == 0:
+            # Find all fourgrams that contain the desired bigram at the end of the "start" list
+            preceding3grams = \
                 [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys() \
                      if w2 == start[-2] and w3 == start[-1]]
-        else:
-            # Find exactly the trigram history that the caller asked for
-            preceding_ngrams = \
-                [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys() \
-                     if w1 == start[-3] and w2 == start[-2] and w3 == start[-3]]
-        if len(preceding_ngrams) == 0:
-            # If we failed to find any occurrence of the requested history, then just allow any
-            # history to be chosen
-            preceding_ngrams = [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys()]
+        if len(start) >= 1 and len(preceding3grams) == 0:
+            # Find all fourgrams that contain the desired unigram at the end of the "start" list
+            preceding3grams = \
+                [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys() if w3 == start[-1]]
+        if len(preceding3grams) == 0:
+            # The caller does not ask for any particular history, or we did not find any match for what
+            # the caller desires, so try find all fourgrams that have a period in penultimate position
+            preceding3grams = \
+                [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys() if w3 == '.']
+        if len(preceding3grams) == 0:
+            # Still no luck: just pick the trigrams that start any of the fourgrams in the corpus
+            preceding3grams = [w1 + " " + w2 + " " + w3 for w1, w2, w3 in self.fourgram_freqs.keys()]
             
-        history = random.choice(preceding_ngrams, 1)[0].split(" ")
+        history = random.choice(preceding3grams, 1)[0].split(" ")
         for i in range(max_len):
             pdist = self.pdist_ngram_normalized(history)
             word = random.choice(list(pdist.keys()), 1, p=list(pdist.values()))[0]
