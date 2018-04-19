@@ -10,4 +10,4 @@ export GIT_COMMITTER_EMAIL=anon@localhost
 git clone https://github.com/Eetusjo/morf-synt-2018.git
 
 pip install nltk
-python -c "import nltk; nltk.download(['gutenberg', 'genesis', 'treebank', 'nps_chat', 'inaugural', 'webtext', 'wordnet', 'punkt', 'averaged_perceptron_tagger', 'brown'])"
+python -c "import nltk; nltk.download(['gutenberg', 'genesis', 'treebank', 'nps_chat', 'inaugural', 'webtext', 'wordnet', 'punkt', 'averaged_perceptron_tagger', 'brown', 'tagsets'])"
